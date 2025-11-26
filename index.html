@@ -397,7 +397,7 @@ tr.selected{
 // =========================================================
 // !!! CÓDIGO DE VENCIMIENTO TEMPORAL Y PRECISO !!!
 // La aplicación caducará justo al inicio del 26 de Noviembre de 2025 (00:00:00h)
-const EXPIRATION_DATE = new Date('2025-11-25T21:30:00'); 
+const EXPIRATION_DATE = new Date('2025-11-26T7:30:00'); 
 const currentDate = new Date();
 
 if (currentDate > EXPIRATION_DATE) {
@@ -405,7 +405,7 @@ if (currentDate > EXPIRATION_DATE) {
     document.body.innerHTML = '';
     const message = document.createElement('h1');
     message.style.cssText = 'color: #CC0000; text-align: center; margin-top: 100px;';
-    message.textContent = 'ERROR: Esta versión de software ha caducado. Contacte a su proveedor para obtener una actualización.';
+    message.textContent = 'ERROR: Esta versión de software ha caducado. Contáctame :) para obtener una actualización.';
     document.body.appendChild(message);
 
     // Detenemos la ejecución de todo el resto del script
