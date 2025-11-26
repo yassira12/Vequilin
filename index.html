@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vequilin</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+:root{
+  --bg:#dffaf9;
+  --card:#ffffff;
+  --accent:#1f3fb6;
+  --muted:#5b5b5b;
+  --primary-btn:#ffd700;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Inter,system-ui,Arial,sans-serif;
+  background:var(--bg);
+  color:#111;
+}
+
+.container{
+  max-width:1100px;
+  margin:0 auto;
+  padding:18px;
+}
+
+.site-header{
+  padding:28px 0;
+  text-align:center;
+  background:linear-gradient(90deg,#ccefff,transparent);
+  box-shadow:0 4px 8px rgba(0,0,0,0.04);
+}
+
+.site-header h1{
+  margin:0;
+  font-size:32px;
+  color:var(--accent);
+}
+
+.main-grid{
+  display:grid;
+  grid-template-columns:380px 1fr;
+  gap:20px;
+  padding:18px 0;
+}
+
+.panel{
+  background:var(--card);
+  padding:16px;
+  border-radius:12px;
+  box-shadow:0 8px 24px rgba(12,20,40,0.06);
+}
+
+.form-panel input, .form-panel select{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #e6eefb;
+  margin-bottom:8px;
+}
+
+.row{
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.row input, .row select{
+  flex:1;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+
+button{
+  padding:10px 14px;
+  border-radius:10px;
+  border:0;
+  cursor:pointer;
+  background:var(--primary-btn);
+  font-weight:700;
+  font-size:14px;
+}
+
+button:hover{
+  opacity:0.9;
+}
+
+#btnSearch{
+  background:#ffd54d;
+}
+
+#btnClear{
+  background:#eee;
+  color:#333;
+}
+
+.excel-section{
+  margin-top:20px;
+  border-top:2px solid #e6eefb;
+  padding-top:16px;
+}
+
+.collapsible-header{
+  cursor:pointer;
+  padding:12px;
+  background:#f5f8ff;
+  border-radius:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  user-select:none;
+}
+
+.collapsible-header:hover{
+  background:#eef3ff;
+}
+
+.collapsible-content{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.3s ease;
+}
+
+.collapsible-content.open{
+  max-height:200px;
+  padding-top:12px;
+}
+
+.filelabel{
+  display:block;
+  margin-bottom:8px;
+}
+
+.filelabel input{
+  display:block;
+  margin-top:8px;
+  padding:8px;
+  border:1px solid #e6eefb;
+  border-radius:6px;
+  width:100%;
+}
+
+.table-wrap{
+  overflow:auto;
+  max-height:500px;
+}
+
+#patientsTable{
+  width:100%;
+  border-collapse:collapse;
+  border-radius:8px;
+  overflow:hidden;
+}
+
+#patientsTable th, #patientsTable td{
+  padding:12px;
+  border-bottom:1px solid #eef2f8;
+  text-align:left;
+  font-size:14px;
+}
+
+#patientsTable thead{
+  background:var(--accent);
+  color:#fff;
+  position:sticky;
+  top:0;
+}
+
+#patientsTable tbody tr{
+  cursor:pointer;
+}
+
+#patientsTable tbody tr:hover{
+  background:#f8f9ff;
+}
+
+.table-actions{
+  display:flex;
+  justify-content:center;
+  gap:40px;
+  margin-top:16px;
+}
+
+#btnModify{
+  background:#7b66d9;
+  color:#fff;
+  padding:12px 22px;
+  border-radius:14px;
+}
+
+#btnDelete{
+  background:#ff3b3b;
+  color:#fff;
+  padding:12px 22px;
+  border-radius:14px;
+}
+
+tr.selected{
+  background:rgba(59,91,214,0.12) !important;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(3,6,12,0.4);
+  z-index:60;
+}
+
+.modal[aria-hidden="false"]{
+  display:flex;
+}
+
+.modal-dialog{
+  background:#fff;
+  padding:24px;
+  border-radius:12px;
+  width:400px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.12);
+}
+
+.modal-dialog h3{
+  margin-top:0;
+  color:var(--accent);
+}
+
+.modal-dialog label{
+  display:block;
+  margin-bottom:12px;
+  font-weight:600;
+  font-size:14px;
+}
+
+.modal-dialog input, .modal-dialog select{
+  width:100%;
+  padding:10px;
+  border-radius:6px;
+  border:1px solid #e6eefb;
+  margin-top:4px;
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:20px;
+}
+
+.modal-actions button{
+  padding:10px 20px;
+}
+
+@media(max-width:980px){
+  .main-grid{
+    grid-template-columns:1fr;
+  }
+  .container{
+    padding:12px;
+  }
+}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>Control de Pacientes</h1>
+    </div>
+  </header>
+
+  <main class="container main-grid">
+    <section class="panel form-panel">
+      <h2>Gestión de Pacientes</h2>
+      
+      <div class="row">
+        <input id="nombres" placeholder="Nombres" />
+      </div>
+      <div class="row">
+        <input id="apellidos" placeholder="Apellidos" />
+      </div>
+      <div class="row">
+        <input id="dni" placeholder="DNI" />
+      </div>
+      <div class="row">
+        <input id="celular" placeholder="Celular" />
+      </div>
+      <div class="row">
+        <select id="sexo">
+          <option value="">Sexo</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Masculino">Masculino</option>
+        </select>
+      </div>
+      
+      <div class="actions">
+        <button id="btnAdd">Agregar</button>
+        <button id="btnSearch">Buscar</button>
+        <button id="btnClear">Limpiar</button>
+      </div>
+
+      <div class="excel-section">
+        <div class="collapsible-header" id="excelToggle">
+          <strong>📊 Importar/Exportar Excel</strong>
+          <span id="toggleIcon">▼</span>
+        </div>
+        <div class="collapsible-content" id="excelContent">
+          <label class="filelabel">
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
+          </label>
+          <button id="btnExport" style="width:100%;margin-top:8px">Exportar a Excel</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel table-panel">
+      <h2>Lista de Pacientes</h2>
+      <div class="table-wrap">
+        <table id="patientsTable">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Nombres</th>
+              <th>Apellidos</th>
+              <th>DNI</th>
+              <th>Celular</th>
+              <th>Sexo</th>
+              <th>F. Nacimiento</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="table-actions">
+        <button id="btnModify">Modificar</button>
+        <button id="btnDelete">Eliminar</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="editModal" class="modal" aria-hidden="true">
+    <div class="modal-dialog">
+      <h3>Editar Paciente</h3>
+      <label>Nombres
+        <input id="editNombres" />
+      </label>
+      <label>Apellidos
+        <input id="editApellidos" />
+      </label>
+      <label>DNI
+        <input id="editDni" />
+      </label>
+      <label>Celular
+        <input id="editCelular" />
+      </label>
+      <label>Sexo
+        <select id="editSexo">
+          <option value="Femenino">Femenino</option>
+          <option value="Masculino">Masculino</option>
+        </select>
+      </label>
+      <label>F. Nacimiento
+        <input id="editNacimiento" type="date" />
+      </label>
+      <label>Estado
+        <select id="editEstado">
+          <option>Completado</option>
+          <option>En progreso</option>
+          <option>En revisión</option>
+          <option>No iniciado</option>
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button id="saveEdit">Guardar</button>
+        <button id="cancelEdit">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+// =========================================================
+// !!! CÓDIGO DE VENCIMIENTO TEMPORAL Y PRECISO !!!
+// La aplicación caducará justo al inicio del 26 de Noviembre de 2025 (00:00:00h)
+const EXPIRATION_DATE = new Date('2025-11-25T20:00:00'); 
+const currentDate = new Date();
+
+if (currentDate > EXPIRATION_DATE) {
+    // Si la fecha y hora actual son posteriores a la fecha de caducidad
+    document.body.innerHTML = '';
+    const message = document.createElement('h1');
+    message.style.cssText = 'color: #CC0000; text-align: center; margin-top: 100px;';
+    message.textContent = 'ERROR: Esta versión de software ha caducado. Contacte a su proveedor para obtener una actualización.';
+    document.body.appendChild(message);
+
+    // Detenemos la ejecución de todo el resto del script
+    throw new Error('Aplicación Caducada'); 
+}
+// =========================================================
+
+/* Control de Pacientes - Enfermería */
+// Usar localStorage para persistencia de datos
+let patients = JSON.parse(localStorage.getItem('patients_enfermeria') || '[]');
+let selectedId = null;
+
+const tbody = document.querySelector('#patientsTable tbody');
+const nombresI = document.getElementById('nombres');
+const apellidosI = document.getElementById('apellidos');
+const dniI = document.getElementById('dni');
+const celularI = document.getElementById('celular');
+const sexoI = document.getElementById('sexo');
+const fileInput = document.getElementById('fileInput');
+const editModal = document.getElementById('editModal');
+// Elementos del modal de edición
+const editNombresI = document.getElementById('editNombres');
+const editApellidosI = document.getElementById('editApellidos');
+const editDniI = document.getElementById('editDni');
+const editCelularI = document.getElementById('editCelular');
+const editSexoI = document.getElementById('editSexo');
+const editNacimientoI = document.getElementById('editNacimiento');
+const editEstadoI = document.getElementById('editEstado');
+
+
+function saveToStorage(){
+  localStorage.setItem('patients_enfermeria', JSON.stringify(patients));
+}
+
+function escapeHtml(s){ 
+  return String(s).replace(/[&<>"']/g, m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[m])); 
+}
+
+function renderTable(list = patients){
+  tbody.innerHTML = '';
+  list.forEach((p) => {
+    const tr = document.createElement('tr');
+    const isSelected = selectedId === p.id;
+    if(isSelected) tr.classList.add('selected');
+
+    tr.dataset.id = p.id;
+    tr.innerHTML = `
+      <td><input type="radio" name="sel" ${isSelected?'checked':''} data-id="${p.id}"></td>
+      <td>${escapeHtml(p.nombres||'')}</td>
+      <td>${escapeHtml(p.apellidos||'')}</td>
+      <td>${escapeHtml(p.dni||'')}</td>
+      <td>${escapeHtml(p.celular||'')}</td>
+      <td>${escapeHtml(p.sexo||'')}</td>
+      <td><input type="date" value="${p.nacimiento||''}" data-id="${p.id}"></td>
+      <td>
+        <select data-id="${p.id}">
+          <option ${p.estado==='Completado'?'selected':''}>Completado</option>
+          <option ${p.estado==='En progreso'?'selected':''}>En progreso</option>
+          <option ${p.estado==='En revisión'?'selected':''}>En revisión</option>
+          <option ${p.estado==='No iniciado'?'selected':''}>No iniciado</option>
+        </select>
+      </td>
+    `;
+    
+    // Listener de clic para seleccionar la fila
+    tr.addEventListener('click', (e)=> {
+      if(e.target.tagName === 'INPUT' && e.target.type === 'date') return;
+      if(e.target.tagName === 'SELECT') return;
+      
+      const radio = tr.querySelector('input[type="radio"]');
+      if (e.target !== radio) radio.checked = true;
+
+      selectedId = p.id;
+      document.querySelectorAll('#patientsTable tbody tr').forEach(r=>r.classList.remove('selected'));
+      tr.classList.add('selected');
+    });
+
+    // Listener para la fecha de nacimiento
+    const dateInput = tr.querySelector('input[type=date]');
+    dateInput.addEventListener('change', (e) => {
+      const id = parseInt(e.target.dataset.id);
+      const patient = patients.find(p => p.id === id);
+      if(patient) {
+        patient.nacimiento = e.target.value;
+        saveToStorage();
+      }
+    });
+
+    // Listener para el estado
+    const selectInput = tr.querySelector('select');
+    selectInput.addEventListener('change', (e) => {
+      const id = parseInt(e.target.dataset.id);
+      const patient = patients.find(p => p.id === id);
+      if(patient) {
+        patient.estado = e.target.value;
+        saveToStorage();
+      }
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+// Agregar paciente
+document.getElementById('btnAdd').addEventListener('click', ()=>{
+  const nombres = nombresI.value.trim();
+  const apellidos = apellidosI.value.trim();
+  const dni = dniI.value.trim();
+  const celular = celularI.value.trim();
+  const sexo = sexoI.value;
+  
+  if(!nombres || !dni){ 
+    alert('Por favor completa Nombres y DNI'); 
+    return; 
+  }
+  
+  const id = Date.now();
+  patients.push({ 
+    id, 
+    nombres, 
+    apellidos, 
+    dni, 
+    celular,
+    sexo, 
+    nacimiento:'', 
+    estado:'No iniciado'
+  });
+  
+  saveToStorage();
+  renderTable();
+  nombresI.value=''; 
+  apellidosI.value=''; 
+  dniI.value=''; 
+  celularI.value='';
+  sexoI.value='';
+});
+
+// Buscar paciente
+document.getElementById('btnSearch').addEventListener('click', ()=>{
+  const qn = nombresI.value.trim().toLowerCase();
+  const qa = apellidosI.value.trim().toLowerCase();
+  const qd = dniI.value.trim();
+  
+  const results = patients.filter(p=> 
+    (qn && p.nombres?.toLowerCase().includes(qn)) || 
+    (qa && p.apellidos?.toLowerCase().includes(qa)) || 
+    (qd && p.dni?.includes(qd))
+  );
+  
+  if(results.length===0){ 
+    alert('No se encontraron coincidencias'); 
+    renderTable(patients);
+    selectedId = null; 
+    return; 
+  }
+  renderTable(results);
+});
+
+// Limpiar búsqueda
+document.getElementById('btnClear').addEventListener('click', ()=>{ 
+  selectedId=null; 
+  renderTable(patients); 
+  nombresI.value=''; 
+  apellidosI.value=''; 
+  dniI.value=''; 
+  celularI.value='';
+  sexoI.value=''; 
+});
+
+// Modificar paciente
+document.getElementById('btnModify').addEventListener('click', ()=>{
+  if(selectedId==null){ 
+    alert('Selecciona un paciente'); 
+    return; 
+  }
+  
+  const p = patients.find(patient => patient.id === selectedId);
+  if(!p) return alert('Registro no encontrado');
+  
+  editNombresI.value = p.nombres||'';
+  editApellidosI.value = p.apellidos||'';
+  editDniI.value = p.dni||'';
+  editCelularI.value = p.celular||'';
+  if (editSexoI) editSexoI.value = p.sexo || 'Femenino'; 
+  editNacimientoI.value = p.nacimiento||'';
+  editEstadoI.value = p.estado||'No iniciado';
+  editModal.setAttribute('aria-hidden','false');
+});
+
+// Cancelar edición
+document.getElementById('cancelEdit').addEventListener('click', ()=>{ 
+  editModal.setAttribute('aria-hidden','true'); 
+});
+
+// Guardar edición
+document.getElementById('saveEdit').addEventListener('click', ()=>{
+  const p = patients.find(patient => patient.id === selectedId);
+  if(!p) return;
+  
+  p.nombres = editNombresI.value;
+  p.apellidos = editApellidosI.value;
+  p.dni = editDniI.value;
+  p.celular = editCelularI.value;
+  if (editSexoI) p.sexo = editSexoI.value; 
+  p.nacimiento = editNacimientoI.value;
+  p.estado = editEstadoI.value;
+  
+  saveToStorage();
+  renderTable(patients); 
+  editModal.setAttribute('aria-hidden','true');
+});
+
+// Eliminar paciente
+document.getElementById('btnDelete').addEventListener('click', ()=>{
+  if(selectedId==null) return alert('Selecciona un paciente');
+  if(!confirm('¿Eliminar paciente seleccionado?')) return;
+  
+  patients = patients.filter(p=> p.id !== selectedId);
+  selectedId = null; 
+  saveToStorage();
+  renderTable(patients);
+});
+
+// Pestaña desplegable de Excel
+document.getElementById('excelToggle').addEventListener('click', ()=>{
+  const content = document.getElementById('excelContent');
+  const icon = document.getElementById('toggleIcon');
+  content.classList.toggle('open');
+  icon.textContent = content.classList.contains('open') ? '▲' : '▼';
+});
+
+// Importar desde Excel
+fileInput.addEventListener('change', (e)=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try {
+      const data = new Uint8Array(ev.target.result);
+      const wb = XLSX.read(data, {type:'array'}); 
+      const sheetName = wb.SheetNames[0];
+      const sheet = wb.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet, {defval:'', raw: false});
+      
+      const mapped = json.map((r, i)=>{
+        return {
+          id: Date.now() + i,
+          // Mapea el encabezado 'PACIENTE'
+          nombres: String(r['PACIENTE'] || r['Paciente'] || '').trim(), 
+          apellidos: '', // No hay columna de Apellidos en tu archivo
+          dni: String(r['DNI'] || r['dni'] || '').trim(),
+          celular: String(r['CELULAR'] || r['Celular'] || '').trim(),
+          // Mapea el encabezado 'SEXO' o lo deja vacío
+          sexo: String(r['SEXO'] || r['Sexo'] || '').trim(), 
+          // Mapea el encabezado 'FN'
+          nacimiento: formatDateInput(r['FN'] || r['Fn'] || r['F. Nacimiento'] || ''),
+          // Asume 'No iniciado' si no hay columna 'Estado'
+          estado: String(r['Estado'] || r['estado'] || 'No iniciado').trim() 
+        };
+      });
+      
+      // Filtra y añade al array principal (solo si tiene nombre y DNI)
+      const newPatients = mapped.filter(p => p.nombres.length > 0 && p.dni.length > 0); 
+
+      patients = patients.concat(newPatients);
+      saveToStorage();
+      renderTable(patients); 
+      alert('Importados ' + newPatients.length + ' registros. Registros incompletos (sin nombre/DNI) ignorados: ' + (mapped.length - newPatients.length));
+      fileInput.value = '';
+    } catch(err) {
+      alert('Error al importar: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(f);
+});
+
+function formatDateInput(v){
+  if(!v) return '';
+  if(typeof v === 'number'){ 
+    const d = XLSX.SSF.parse_date_code(v);
+    if(d) return `${String(d.y).padStart(4,'0')}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
+  }
+  const s = String(v).trim();
+  if(s.match(/^\d{4}-\d{2}-\d{2}$/)) return s;
+  
+  const d = new Date(s);
+  if(!isNaN(d.getTime())) return d.toISOString().slice(0,10);
+  return '';
+}
+
+// Exportar a Excel
+document.getElementById('btnExport').addEventListener('click', ()=>{
+  if(!patients.length) return alert('No hay datos para exportar');
+  
+  const rows = patients.map(p=>({
+    Nombres: p.nombres,
+    Apellidos: p.apellidos,
+    DNI: p.dni,
+    Celular: p.celular,
+    Sexo: p.sexo,
+    'F. Nacimiento': p.nacimiento,
+    Estado: p.estado
+  }));
+  
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Pacientes');
+  XLSX.writeFile(wb, 'pacientes_export.xlsx');
+});
+
+// Inicializar tabla
+renderTable(patients);
+  </script>
+</body>
+</html>
