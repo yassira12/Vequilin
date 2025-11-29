@@ -3,18 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>VEQUILIN</title>
+  <title>Búsqueda de Pacientes | NUEVO PROYECTO</title>
   
-  <link rel="icon" href="logo.png" type="image/png"> 
-  <link rel="shortcut icon" href="logo.png" type="image/png"> 
+  <link rel="icon" href="INYE.png" type="image/png"> 
+  <link rel="shortcut icon" href="INYE.png" type="image/png"> 
 
   <style>
 :root{
-  --bg:#f8f9fa;
-  --card:#ffffff;
-  --accent:#007bff;
-  --muted:#5b5b5b;
-  --primary-btn:#28a745;
+  --primary-color: #00bcd4; /* Azul cian principal */
+  --secondary-color: #34495e; /* Azul oscuro para encabezados */
+  --bg-light: #f4f6f9; /* Fondo muy claro */
+  --card-bg: #ffffff;
+  --success-btn: #4CAF50;
+  --danger-tag: #e74c3c;
+  --safe-tag: #2ecc71;
 }
 
 *{
@@ -23,97 +25,118 @@
 
 body{
   margin:0;
-  font-family:Inter,system-ui,Arial,sans-serif;
-  background:var(--bg);
-  color:#111;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background:var(--bg-light);
+  color:#333;
 }
 
 .container{
-  max-width:1100px;
+  max-width:1000px;
   margin:0 auto;
-  padding:18px;
+  padding:20px;
 }
 
 .site-header{
-  padding:28px 0;
+  padding:30px 0;
   text-align:center;
-  background:#e9ecef;
-  box-shadow:0 4px 8px rgba(0,0,0,0.04);
+  background:var(--secondary-color);
+  color:var(--card-bg);
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);
+  margin-bottom:25px;
 }
 
-/* ESTILOS PARA EL LOGO PRINCIPAL */
-#siteLogo {
-  max-width: 250px; 
-  height: auto;
-  display: block; 
-  margin: 0 auto; 
+.site-header h1{
+    margin: 0;
+    font-size: 1.8em;
 }
 
 .panel{
-  background:var(--card);
-  padding:20px;
-  border-radius:12px;
-  box-shadow:0 8px 24px rgba(12,20,40,0.06);
+  background:var(--card-bg);
+  padding:25px;
+  border-radius:10px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.08);
   margin-bottom:20px;
 }
 
 .search-panel{
-  max-width:800px;
-  margin:20px auto;
   text-align:center;
+  /* CORRECCIÓN: Limitar el ancho del panel de búsqueda y centrarlo */
+  max-width: 550px; /* Reducido a 550px para hacerlo más compacto */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .search-panel h2{
-  color:var(--accent);
+  color:var(--primary-color);
   margin-top:0;
+  font-size: 1.5em;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 10px;
 }
 
+/* Contenedor para centrar el ancho limitado de los inputs */
+.input-container-wrap {
+    display: flex;
+    justify-content: center; /* Centra el contenido */
+}
+
+/* Ancho limitado para los campos de búsqueda */
 .search-controls{
-  display:flex;
-  gap:15px;
-  margin-bottom:15px;
+  display:flex; 
+  flex-direction: column; 
+  gap:15px; 
+  margin-bottom:20px;
+  width: 100%;
+  max-width: 450px; /* Ancho máximo para que no se vea muy largo */
 }
 
 .search-controls input{
-  flex-grow:1;
-  padding:10px;
+  width: 100%; 
+  padding:12px 15px;
   border-radius:8px;
-  border:1px solid #ced4da;
-  font-size:16px;
+  border:1px solid #bdc3c7;
+  font-size:1em;
+  transition: border-color 0.3s;
+}
+
+.search-controls input:focus{
+    border-color: var(--primary-color);
+    outline: none;
 }
 
 .actions{
   display:flex;
-  gap:10px;
+  gap:15px;
   justify-content:center;
 }
 
 button{
-  padding:10px 20px;
+  padding:12px 25px;
   border-radius:8px;
   border:0;
   cursor:pointer;
-  font-weight:700;
-  font-size:16px;
-  transition:background 0.2s;
+  font-weight:600;
+  font-size:1em;
+  transition:background 0.3s, transform 0.1s;
 }
 
 #btnSearch{
-  background:var(--primary-btn);
+  background:var(--success-btn);
   color:#fff;
 }
 
 #btnSearch:hover{
-  background:#1e7e34;
+  background:#3e8e41;
+  transform: translateY(-1px);
 }
 
 #btnClear{
-  background:#e2e6ea;
+  background:#ecf0f1;
   color:#333;
 }
 
 #btnClear:hover{
-  background:#dae0e5;
+  background:#bdc3c7;
 }
 
 .table-panel{
@@ -127,56 +150,99 @@ button{
 
 #resultsTable{
   width:100%;
-  border-collapse:collapse;
-  border-radius:8px;
+  border-collapse:separate; 
+  border-spacing: 0;
+  border-radius:10px;
   overflow:hidden;
 }
 
+/* Centrar el contenido de las últimas dos columnas */
+#resultsTable th:nth-child(4), #resultsTable td:nth-child(4), 
+#resultsTable th:nth-child(5), #resultsTable td:nth-child(5) {
+    text-align: center;
+}
+
+/* FRANJAS DE LA TABLA MÁS DELGADAS */
 #resultsTable th, #resultsTable td{
-  padding:12px;
-  border-bottom:1px solid #eef2f8;
-  text-align:left;
-  font-size:14px;
+  padding:10px; 
+  font-size:0.95em;
   white-space:nowrap;
 }
 
 #resultsTable thead{
-  background:var(--accent);
+  background:var(--secondary-color);
   color:#fff;
   position:sticky;
   top:0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 #resultsTable tbody tr:nth-child(even){
-  background:#f8f9fa;
+  background:#f9f9f9;
 }
 
 #resultsTable tbody tr:hover{
-  background:#e9ecef;
+  background:#eaf2f8;
+}
+
+/* Estilos específicos para la columna ESTADO */
+.tag-apto {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background-color: var(--safe-tag);
+    color: white;
+    font-weight: bold;
+    font-size: 0.85em;
+}
+
+.tag-no-apto {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background-color: var(--danger-tag);
+    color: white;
+    font-weight: bold;
+    font-size: 0.85em;
 }
 
 .no-results{
   text-align:center;
-  padding:20px;
-  color:var(--muted);
-  font-size:1.1em;
+  padding:30px;
+  color:var(--secondary-color);
+  font-size:1.2em;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    .actions {
+        flex-direction: column;
+    }
+    button {
+        width: 100%;
+    }
+    .search-controls, .search-panel { /* En pantallas pequeñas, no limitamos el ancho */
+        max-width: 100%;
+    }
 }
   </style>
 </head>
 <body>
   <header class="site-header">
     <div class="container">
-      <h1>VEQUILIN</h1>
+      <h1>BÚSQUEDA DE PACIENTES</h1>
     </div>
   </header>
 
   <main class="container">
     <section class="panel search-panel">
-      <h2>Búsqueda de Paciente Quirúrgico</h2> 
+      <h2>Consulta de Estado y Cita</h2> 
       
-      <div class="search-controls">
-        <input id="nombreSearch" placeholder="Nombre y Apellido del bebé" />
-        <input id="dniSearch" placeholder="DNI del bebé" />
+      <div class="input-container-wrap">
+          <div class="search-controls">
+            <input id="nombreSearch" placeholder="Nombres y Apellidos" />
+            <input id="dniSearch" placeholder="DNI" />
+          </div>
       </div>
       
       <div class="actions">
@@ -186,18 +252,16 @@ button{
     </section>
 
     <section id="resultsSection" class="panel table-panel">
-      <h2>Detalles del Paciente Quirúrgico</h2> 
+      <h2>Resultados de la Búsqueda</h2> 
       <div class="table-wrap">
         <table id="resultsTable">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Nombre y Apellido</th>
-              <th>DNI (Bebé)</th>
-              <th>Celular</th>
-              <th>F. Nacimiento</th>
-              <th>Mamá</th>
-              <th>DNI (Mamá)</th>
+              <th>Nombres y Apellidos</th>
+              <th>DNI</th>
+              <th>Estado</th>
+              <th>Fecha de Cita</th>
             </tr>
           </thead>
           <tbody>
@@ -205,7 +269,7 @@ button{
         </table>
       </div>
       <div id="noResults" class="no-results" style="display:none;">
-        No se encontraron resultados que coincidan con la búsqueda.
+        ❌ No se encontraron resultados que coincidan con la búsqueda.
       </div>
     </section>
   </main>
@@ -213,40 +277,22 @@ button{
   <script>
 
 // =========================================================
-// !!! BASE DE DATOS FINAL (30 REGISTROS) !!!
+// !!! BASE DE DATOS DE PACIENTES FINALES (10 REGISTROS) !!!
 // ----------------------------------------------------------------------
 const initialData = [
-  // PACIENTE (Bebé)                       DNI (Bebé) Celular     FN           MAMÁ (Madre)                   DNI (Mamá)
-  { id: 1, paciente: "OLORTEGUI NEYRA SOLANGE (F)", dni: "94091162", celular: "950273851", fn: "01/01/2025", mama: "NEYRA CUEVA MORELIA", dniMama: "71820040" },
-  { id: 2, paciente: "ROSAS LOPEZ RN", dni: "NT", celular: "907752067", fn: "01/01/2025", mama: "LOPEZ JUAREZ LEISDY", dniMama: "74647382" },
-  { id: 3, paciente: "LEON SALAZAR RN", dni: "NT", celular: "946033609", fn: "03/01/2025", mama: "KATHERINE SALAZAR ALCA", dniMama: "70571970" },
-  { id: 4, paciente: "VELA MEGO RN", dni: "94095452", celular: "992245212", fn: "05/01/2025", mama: "MEGO FERNANDEZ ELIZABETH", dniMama: "46304197" },
-  { id: 5, paciente: "MANRIQUE CRISTOBAL RN (F)", dni: "NT", celular: "915368354", fn: "03/01/2025", mama: "CRISTOBAL HINOSTROZA EVELYN", dniMama: "73801832" },
-  { id: 6, paciente: "TOVAR MAYHUAY RN", dni: "94096529", celular: "903040466", fn: "06/01/2025", mama: "MAYHUAY CHAVEZ MILEYDI", dniMama: "76467620" },
-  { id: 7, paciente: "CARHUAJULCA HERNANDEZ RN", dni: "NT", celular: "948245358", fn: "06/01/2025", mama: "HERNANDEZ CORONADO MILAGROS", dniMama: "46142757" },
-  { id: 8, paciente: "GARCIA SANDOVAL RN", dni: "NT", celular: "902846273", fn: "10/01/2025", mama: "SANDOVAL HERRERA DULCE", dniMama: "73091943" },
-  { id: 9, paciente: "MORE NIME DANNA", dni: "94099259", celular: "922887452", fn: "08/01/2025", mama: "NIME GUEVARA CARLA", dniMama: "47018155" },
-  { id: 10, paciente: "NAVARRETE REYES RN", dni: "NT", celular: "997464044", fn: "09/01/2025", mama: "GABRIELA REYES VELASQUEZ", dniMama: "C408651" },
-  { id: 11, paciente: "ACOSTA GALVEZ RN", dni: "NT", celular: "984273062", fn: "10/01/2025", mama: "GALVEZ GARAY", dniMama: "77569360" },
-  { id: 12, paciente: "SOLANO CHINCHAY AMY HANIELY", dni: "94101064", celular: "984599879", fn: "09/01/2025", mama: "CHINCHAY TOLEDO LESLY", dniMama: "47185485" },
-  { id: 13, paciente: "RIOS QUIROZ RN", dni: "NT", celular: "930731743", fn: "07/01/2025", mama: "QUIROS YOVERA VANESA", dniMama: "76448487" },
-  { id: 14, paciente: "AZAÑERO PAREDES RN", dni: "NT", celular: "948176654", fn: "11/01/2025", mama: "PAREDES MORILLO HELEN", dniMama: "42573127" },
-  { id: 15, paciente: "GASPAR VILCHEZ EITHAN", dni: "94090657", celular: "989725093", fn: "31/12/2024", mama: "VILCHEZ FLORES LILIANA", dniMama: "70792498" },
-  { id: 16, paciente: "GAMARRA EVANGELISTA ESTRELLA AL", dni: "94120168", celular: "949312765", fn: "11/01/2025", mama: "EVANGELISTA GOMERO MIRIAM", dniMama: "46800325" },
-  { id: 17, paciente: "SAAVEDRA SILVA SOFIA JAZMIN", dni: "94107583", celular: "959773374", fn: "11/01/2025", mama: "SILVA VENTURA JACQUELIN", dniMama: "48030805" },
-  { id: 18, paciente: "CAHUAZA SILVA ANTONELLA", dni: "94107796", celular: "953063369", fn: "16/01/2025", mama: "—", dniMama: "46287761" },
-  { id: 19, paciente: "SOTO NOLBERTO RN", dni: "NT", celular: "936650228", fn: "13/01/2025", mama: "YOLANDA NOLBERTO QUISPE", dniMama: "46866349" },
-  { id: 20, paciente: "CALLIRGOS AGURTO RN", dni: "NT", celular: "931094201", fn: "14/01/2025", mama: "AGURTO REYES FABIOLA", dniMama: "74371690" },
-  { id: 21, paciente: "MORI CAMPOS AINHOA ANTONELLA", dni: "94094890", celular: "955466711", fn: "04/01/2025", mama: "KU MOYA MARIBEL", dniMama: "73468873" },
-  { id: 22, paciente: "ROMERO KU WIN NAJIB", dni: "94109964", celular: "941631320", fn: "17/01/2025", mama: "KU MOYA MARIBEL", dniMama: "42939478" },
-  { id: 23, paciente: "SOPLIN BERMUDEZ JOSHUA ALI", dni: "94107198", celular: "930223517", fn: "15/01/2025", mama: "BERMUDEZ CLOMET KARINA", dniMama: "75621397" },
-  { id: 24, paciente: "CANALES ORDOÑEZ ITAMAR", dni: "94095747", celular: "949843567", fn: "05/01/2025", mama: "ORDOÑEZ AYALA ALISSON", dniMama: "48505030" },
-  { id: 25, paciente: "LEANDRO VILLANUEVA JHON GUILLER", dni: "NT", celular: "978056979", fn: "17/01/2025", mama: "VILLANUEVA CERVANTES YANET", dniMama: "45432895" },
-  { id: 26, paciente: "NINA SIMBRON RN", dni: "NT", celular: "964965000", fn: "17/01/2025", mama: "SIMBRON ALPACA EMILI", dniMama: "71333361" },
-  { id: 27, paciente: "CORDOVA CORDOVA ALLANYS", dni: "94109808", celular: "939671804", fn: "17/01/2025", mama: "CORDOVA MORETO YULISA", dniMama: "72415979" },
-  { id: 28, paciente: "CHAVEZ PINEDO RN", dni: "NT", celular: "919014971", fn: "20/01/2025", mama: "PINEDO ROMAINA ISABEL", dniMama: "46512811" },
-  { id: 29, paciente: "CHUMBIRAY PALOMINO RN", dni: "NT", celular: "922173229", fn: "23/01/2025", mama: "—", dniMama: "—" },
-  { id: 30, paciente: "ROSALES FLORES JESE MATEO", dni: "94117446", celular: "987768840", fn: "24/01/2025", mama: "FLORES VASQUEZ NORA", dniMama: "41407130" },
+  // --- GRUPO APTO ---
+  { id: 1, nombre: "JUAN BAUTISTA GASCO SAAVEDRA", dni: "10687088", estado: "Apto", fecha: "1/10/2025" },
+  { id: 2, nombre: "MARIA DEL ROSARIO EYZAGUIRRE ARENAS", dni: "22091902", estado: "Apto", fecha: "1/10/2025" },
+  { id: 3, nombre: "GIOVANA VILMA CAMPOS ORTIZ", dni: "06669511", estado: "Apto", fecha: "1/10/2025" },
+  { id: 4, nombre: "ROSA MERCEDES CARDENAS ORTIZ", dni: "08086291", estado: "Apto", fecha: "1/10/2025" },
+  { id: 5, nombre: "MARTIN CESAR CORDOVA ORDOÑEZ", dni: "06863771", estado: "Apto", fecha: "1/10/2025" },
+  
+  // --- GRUPO NO APTO ---
+  { id: 6, nombre: "MOZOMBITE AQUITUARI JOSE ADRIANO", dni: "09756090", estado: "No Apto", fecha: "" },
+  { id: 7, nombre: "SANTOS PADILLA ANGELICA GLORIA", dni: "09184030", estado: "No Apto", fecha: "" },
+  { id: 8, nombre: "FERNANDEZ QUISPE SONIA ALEXANDRA", dni: "47078250", estado: "No Apto", fecha: "" },
+  { id: 9, nombre: "TAPIA FLORES SHEYLA ISABEL", dni: "76272978", estado: "No Apto", fecha: "" },
+  { id: 10, nombre: "TRUJILLANO CAVERO JUAN MANUEL", dni: "08682006", estado: "No Apto", fecha: "" },
 ];
 // =========================================================
 
@@ -258,6 +304,7 @@ const btnClear = document.getElementById('btnClear');
 const noResultsDiv = document.getElementById('noResults');
 const resultsSection = document.getElementById('resultsSection');
 
+// Función de seguridad
 function escapeHtml(s){ 
   return String(s).replace(/[&<>"']/g, m => ({
     '&':'&amp;',
@@ -279,15 +326,26 @@ function renderTable(list){
   noResultsDiv.style.display = 'none';
 
   list.forEach((p) => {
+    
+    // LÓGICA CONDICIONAL: Determina el contenido de la columna FECHA
+    let fechaCita;
+    const isApto = p.estado.toLowerCase() === 'apto';
+    if (isApto) {
+        fechaCita = escapeHtml(p.fecha || '');
+    } else {
+        fechaCita = 'Esperando Examen Pre-Quirúrgicos';
+    }
+    
+    // LÓGICA DE ESTILOS: Determina el color del tag
+    const estadoClass = isApto ? 'tag-apto' : 'tag-no-apto';
+    
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${escapeHtml(p.id)}</td>
-      <td>${escapeHtml(p.paciente || '')}</td>
+      <td>${escapeHtml(p.nombre || '')}</td>
       <td>${escapeHtml(p.dni || '')}</td>
-      <td>${escapeHtml(p.celular || '')}</td>
-      <td>${escapeHtml(p.fn || '')}</td>
-      <td>${escapeHtml(p.mama || '')}</td>
-      <td>${escapeHtml(p.dniMama || '')}</td>
+      <td><span class="${estadoClass}">${escapeHtml(p.estado || '')}</span></td>
+      <td>${fechaCita}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -298,7 +356,7 @@ function handleSearch(){
   const dniQuery = dniSearchInput.value.trim(); 
 
   if(!nombreQuery && !dniQuery) {
-    alert('Debe ingresar el Nombre/Apellido o el DNI del bebé para iniciar la búsqueda.');
+    alert('Debe ingresar el Nombre/Apellido o el DNI del paciente para iniciar la búsqueda.');
     resultsSection.style.display = 'none'; 
     return;
   }
@@ -308,12 +366,10 @@ function handleSearch(){
     let matchDni = true;
 
     if (nombreQuery) {
-        // Busca en el campo del Bebé (paciente)
-        matchNombre = p.paciente.toLowerCase().includes(nombreQuery);
+        matchNombre = p.nombre.toLowerCase().includes(nombreQuery);
     }
     
     if (dniQuery) {
-        // Busca en el campo del DNI del Bebé (dni)
         matchDni = p.dni.includes(dniQuery);
     }
 
@@ -333,11 +389,9 @@ function handleClear(){
   tbody.innerHTML = '';
 }
 
-// Escuchadores de eventos para los botones
 btnSearch.addEventListener('click', handleSearch);
 btnClear.addEventListener('click', handleClear);
 
-// Permitir búsqueda al presionar Enter en cualquiera de los inputs
 nombreSearchInput.addEventListener('keypress', function(e) {
   if (e.key === 'Enter') {
     handleSearch();
