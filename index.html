@@ -8,6 +8,8 @@
   <link rel="icon" href="INYE.png" type="image/png"> 
   <link rel="shortcut icon" href="INYE.png" type="image/png"> 
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
   <style>
 :root{
   --primary-color: #00bcd4; /* Azul cian principal */
@@ -60,8 +62,8 @@ body{
 
 .search-panel{
   text-align:center;
-  /* CORRECCIÓN: Limitar el ancho del panel de búsqueda y centrarlo */
-  max-width: 550px; /* Reducido a 550px para hacerlo más compacto */
+  /* Limitar el ancho del panel de búsqueda y centrarlo */
+  max-width: 550px; 
   margin-left: auto;
   margin-right: auto;
 }
@@ -77,7 +79,7 @@ body{
 /* Contenedor para centrar el ancho limitado de los inputs */
 .input-container-wrap {
     display: flex;
-    justify-content: center; /* Centra el contenido */
+    justify-content: center; 
 }
 
 /* Ancho limitado para los campos de búsqueda */
@@ -87,7 +89,7 @@ body{
   gap:15px; 
   margin-bottom:20px;
   width: 100%;
-  max-width: 450px; /* Ancho máximo para que no se vea muy largo */
+  max-width: 450px; 
 }
 
 .search-controls input{
@@ -156,9 +158,10 @@ button{
   overflow:hidden;
 }
 
-/* Centrar el contenido de las últimas dos columnas */
-#resultsTable th:nth-child(4), #resultsTable td:nth-child(4), 
-#resultsTable th:nth-child(5), #resultsTable td:nth-child(5) {
+/* Centrar el contenido de DNI, Estado y Fecha de Cita */
+#resultsTable th:nth-child(3), #resultsTable td:nth-child(3), /* DNI */
+#resultsTable th:nth-child(4), #resultsTable td:nth-child(4), /* Estado */
+#resultsTable th:nth-child(5), #resultsTable td:nth-child(5) { /* Fecha de Cita */
     text-align: center;
 }
 
@@ -214,6 +217,36 @@ button{
   font-weight: 600;
 }
 
+/* Estilos para el botón de video */
+.video-button-container {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.video-button {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease, transform 0.1s;
+    box-shadow: 0 4px 10px rgba(0, 188, 212, 0.3);
+}
+
+.video-button:hover {
+    background-color: #00acc1; /* Un tono un poco más oscuro */
+    transform: translateY(-2px);
+}
+
+.video-button i {
+    margin-right: 10px;
+    font-size: 1.4em;
+}
+
 @media (max-width: 600px) {
     .actions {
         flex-direction: column;
@@ -221,7 +254,7 @@ button{
     button {
         width: 100%;
     }
-    .search-controls, .search-panel { /* En pantallas pequeñas, no limitamos el ancho */
+    .search-controls, .search-panel { 
         max-width: 100%;
     }
 }
@@ -230,7 +263,8 @@ button{
 <body>
   <header class="site-header">
     <div class="container">
-      <h1>BÚSQUEDA DE PACIENTES</h1>
+      <h1>VEQUILIN</h1>
+      <h1>"Tu bien estar, nuestra prioridad en línea"</h1>
     </div>
   </header>
 
@@ -271,6 +305,13 @@ button{
       <div id="noResults" class="no-results" style="display:none;">
         ❌ No se encontraron resultados que coincidan con la búsqueda.
       </div>
+      
+      <div id="videoButtonWrapper" class="video-button-container" style="display:none;">
+          <a href="PACIENTES.mp4" target="_blank" class="video-button">
+              <i class="fas fa-video"></i> Ver video
+          </a>
+      </div>
+
     </section>
   </main>
 
@@ -303,6 +344,8 @@ const btnSearch = document.getElementById('btnSearch');
 const btnClear = document.getElementById('btnClear');
 const noResultsDiv = document.getElementById('noResults');
 const resultsSection = document.getElementById('resultsSection');
+const videoButtonWrapper = document.getElementById('videoButtonWrapper');
+
 
 // Función de seguridad
 function escapeHtml(s){ 
@@ -318,12 +361,15 @@ function escapeHtml(s){
 function renderTable(list){
   tbody.innerHTML = '';
   resultsSection.style.display = 'block'; 
+  videoButtonWrapper.style.display = 'none'; // Ocultar el botón de video por defecto
 
   if (list.length === 0) {
     noResultsDiv.style.display = 'block';
     return;
   }
   noResultsDiv.style.display = 'none';
+
+  let anyAptoFound = false; // Bandera para saber si se encontró algún paciente APTO
 
   list.forEach((p) => {
     
@@ -332,6 +378,7 @@ function renderTable(list){
     const isApto = p.estado.toLowerCase() === 'apto';
     if (isApto) {
         fechaCita = escapeHtml(p.fecha || '');
+        anyAptoFound = true; // Se encontró al menos un APTO
     } else {
         fechaCita = 'Esperando Examen Pre-Quirúrgicos';
     }
@@ -349,6 +396,11 @@ function renderTable(list){
     `;
     tbody.appendChild(tr);
   });
+
+  // Mostrar el botón de video si se encontró al menos un paciente APTO
+  if (anyAptoFound) {
+      videoButtonWrapper.style.display = 'block';
+  }
 }
 
 function handleSearch(){
@@ -358,6 +410,7 @@ function handleSearch(){
   if(!nombreQuery && !dniQuery) {
     alert('Debe ingresar el Nombre/Apellido o el DNI del paciente para iniciar la búsqueda.');
     resultsSection.style.display = 'none'; 
+    videoButtonWrapper.style.display = 'none'; // Ocultar si no hay búsqueda
     return;
   }
   
@@ -384,6 +437,7 @@ function handleClear(){
   dniSearchInput.value = '';
   
   resultsSection.style.display = 'none'; 
+  videoButtonWrapper.style.display = 'none'; // Ocultar al limpiar
   
   noResultsDiv.style.display = 'none';
   tbody.innerHTML = '';
